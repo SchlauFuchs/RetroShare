@@ -889,17 +889,19 @@ QVariant RetroshareDirModel::data(const QModelIndex &index, int role) const
 			return QVariant(QColor(Qt::gray)) ;
         else if(RemoteMode)
         {
+            // Same convention as the search results list (SearchDialog's
+            // textColorLocal/textColorDownloading, default.qss:285-286):
+            // red = we already have this file, green = it's downloading.
             FileInfo info;
-            QVariant local_file_color = QVariant(QColor(Qt::red));
             if(rsFiles->alreadyHaveFile(details.hash, info))
-                return local_file_color;
+                return QVariant(QColor(Qt::red));
 
             std::list<RsFileHash> downloads;
             rsFiles->FileDownloads(downloads);
             if(std::find(downloads.begin(), downloads.end(), details.hash) != downloads.end())
-                return local_file_color;
-            else
-                return QVariant();
+                return QVariant(QColor(0, 128, 0)); // CSS "green", matching SearchDialog's commented-out literal
+
+            return QVariant();
         }
 		else
 			return QVariant() ; // standard
